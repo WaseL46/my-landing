@@ -193,6 +193,17 @@
       background: var(--panel);
     }
     .service-card { display: flex; flex-direction: column; align-items: flex-start; }
+    .service-image {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 3 / 2;
+      object-fit: cover;
+      margin-bottom: 24px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--panel-light);
+    }
     .service-card .description { flex: 1; color: var(--muted); }
     .service-icon {
       display: grid;
@@ -546,7 +557,9 @@
           </article>
 
           <article class="card service-card">
-            <div class="service-icon" aria-hidden="true">◎</div>
+            <img class="service-image" src="assets/images/match-analysis.jpg"
+                 alt="Игрок анализирует повтор матча и делает заметки по тактике"
+                 width="900" height="600" loading="lazy" decoding="async">
             <h3>Калибровка рейтинга</h3>
             <p class="description">Демонстрационный формат сопровождения калибровочных игр.</p>
             <p class="price">от 1 490 ₽ <small>/ услуга</small></p>
@@ -558,7 +571,9 @@
           </article>
 
           <article class="card service-card">
-            <div class="service-icon" aria-hidden="true">⊕</div>
+            <img class="service-image" src="assets/images/team-play.jpg"
+                 alt="Три игрока в гарнитурах координируют действия за компьютерами"
+                 width="900" height="600" loading="lazy" decoding="async">
             <h3>Игры с опытным игроком</h3>
             <p class="description">Командная практика с акцентом на взаимодействие в матче.</p>
             <p class="price">от 390 ₽ <small>/ игра</small></p>
@@ -570,7 +585,9 @@
           </article>
 
           <article class="card service-card">
-            <div class="service-icon" aria-hidden="true">◇</div>
+            <img class="service-image" src="assets/images/coaching.jpg"
+                 alt="Тренер объясняет игроку тактику на игровом мониторе"
+                 width="900" height="600" loading="lazy" decoding="async">
             <h3>Индивидуальное обучение Dota 2</h3>
             <p class="description">Разбор повторов, ошибок на линии и решений по карте.</p>
             <p class="price">от 790 ₽ <small>/ час</small></p>
