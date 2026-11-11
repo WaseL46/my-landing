@@ -192,16 +192,25 @@
       border-radius: var(--radius);
       background: var(--panel);
     }
-    .service-card { display: flex; flex-direction: column; align-items: flex-start; }
+    .service-card {
+      --service-padding: 26px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      overflow: hidden;
+      padding: var(--service-padding);
+    }
     .service-image {
       display: block;
-      width: 100%;
+      flex-shrink: 0;
+      width: calc(100% + var(--service-padding) * 2);
+      max-width: none;
       height: auto;
       aspect-ratio: 3 / 2;
       object-fit: cover;
-      margin-bottom: 24px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
+      margin: calc(-1 * var(--service-padding)) calc(-1 * var(--service-padding)) 24px;
+      border-bottom: 1px solid var(--border);
+      border-radius: 0;
       background: var(--panel-light);
     }
     .service-card .description { flex: 1; color: var(--muted); }
@@ -420,6 +429,7 @@
       .hero-actions { flex-direction: column; }
       .services-grid, .offers-grid, .field-row, .steps { grid-template-columns: 1fr; }
       .card { padding: 22px; }
+      .service-card { --service-padding: 22px; }
       .section { padding-block: 52px; }
       .steps { gap: 18px; }
       .steps li::before { margin-bottom: 12px; }
