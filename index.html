@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101014">
+  <meta name="description" content="Учебный лендинг DOTA2-bust: услуги, демонстрационные предложения и калькулятор стоимости повышения MMR.">
+  <title>DOTA2-bust — твой путь к новому рейтингу</title>
+
+  <style>
+    /* Основа, доступность и общие элементы */
+    :root {
+      color-scheme: dark;
+      --bg: #101014;
+      --panel: #19191f;
+      --panel-light: #202027;
+      --text: #f5f3f1;
+      --muted: #b7b5bf;
+      --red: #ef493f;
+      --red-light: #ff746b;
+      --border: #35353f;
+      --error: #ffaaa4;
+      --header-height: 82px;
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: calc(var(--header-height) + 24px);
+    }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.6;
+    }
+    [hidden] { display: none !important; }
+    a { color: inherit; text-decoration: none; }
+    button, input, textarea { font: inherit; }
+    button, a, input, textarea { -webkit-tap-highlight-color: transparent; }
+    button { cursor: pointer; }
+    button, input, textarea { border-radius: 10px; }
+    input, textarea { min-width: 0; }
+    svg { max-width: 100%; }
+    :focus-visible {
+      outline: 3px solid #ffbf82;
+      outline-offset: 5px;
+    }
+    ::selection { background: #9c302b; color: white; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2, h3 { line-height: 1.15; }
+    h1 { font-size: clamp(2.5rem, 5vw, 4.8rem); letter-spacing: -.055em; }
+    h2 { font-size: clamp(2rem, 3.7vw, 3.2rem); letter-spacing: -.04em; }
+    h3 { font-size: 1.25rem; }
+    p { margin-bottom: 1rem; }
+    .container { width: min(1180px, calc(100% - 40px)); margin-inline: auto; }
+    .section { padding-block: 88px; }
+    .section-heading { max-width: 720px; margin-bottom: 36px; }
+    .section-heading p { color: var(--muted); }
+    .eyebrow {
+      display: block;
+      margin-bottom: 16px;
+      color: var(--red-light);
+      font-size: .76rem;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    .muted, .note { color: var(--muted); }
+    .note { font-size: .88rem; }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 12px 20px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      background: var(--red);
+      color: #fff;
+      font-weight: 700;
+      line-height: 1.35;
+      text-align: center;
+      transition: background .18s, border-color .18s, transform .18s;
+    }
+    .button:hover { background: #d93b32; transform: translateY(-2px); }
+    .button.secondary { background: transparent; border-color: #62616b; }
+    .button.secondary:hover { background: #ffffff09; border-color: var(--red-light); }
+    .skip-link {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 100;
+      padding: 12px;
+      background: white;
+      color: black;
+      transform: translateY(-160%);
+    }
+    .skip-link:focus { transform: translateY(0); }
+    .badge {
+      display: inline-flex;
+      padding: 6px 10px;
+      border: 1px solid #ef493f55;
+      border-radius: 6px;
+      background: #ef493f12;
+      color: #ffaaa4;
+      font-size: .75rem;
+      font-weight: 700;
+    }
+
+    /* Закреплённая шапка */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: #101014f5;
+      border-bottom: 1px solid var(--border);
+    }
+    .header-inner {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 22px;
+      min-height: var(--header-height);
+    }
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+      font-size: 1.15rem;
+      font-weight: 900;
+      letter-spacing: -.04em;
+    }
+    .logo svg { width: 30px; height: 30px; color: var(--red); }
+    .logo span { color: var(--red-light); }
+    .nav-list {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .nav-list a {
+      display: block;
+      padding-block: 10px;
+      color: var(--muted);
+      font-size: .86rem;
+      font-weight: 700;
+    }
+    .nav-list a:hover { color: var(--text); }
+    .menu-toggle {
+      display: none;
+      min-height: 44px;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+    }
+
+    /* Главный экран с калькулятором */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+      background:
+        radial-gradient(ellipse at 85% 40%, #a82b2429, transparent 50%),
+        linear-gradient(135deg, #17171d, #101014 65%);
+    }
+    .hero-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 30px;
+      min-height: 660px;
+      padding-block: 70px;
+    }
+    .hero h1 { margin-bottom: 24px; }
+    .hero h1 span { color: var(--red-light); }
+    .hero-copy > p { max-width: 560px; color: var(--muted); font-size: 1.1rem; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-block: 28px; }
+    /* Услуги и предложения */
+    .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+    .card {
+      min-width: 0;
+      padding: 26px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--panel);
+    }
+    .service-card { display: flex; flex-direction: column; align-items: flex-start; }
+    .service-card .description { flex: 1; color: var(--muted); }
+    .service-icon {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      margin-bottom: 28px;
+      border: 1px solid #ef493f55;
+      border-radius: 12px;
+      color: var(--red-light);
+      background: #ef493f0d;
+      font-size: 1.35rem;
+      font-weight: 800;
+    }
+    .price { margin-bottom: 22px; font-size: 1.45rem; font-weight: 800; }
+    .price small { color: var(--muted); font-size: .8rem; font-weight: 400; }
+    .service-detail {
+      width: 100%;
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: .9rem;
+    }
+    .service-detail p { margin: 0; }
+    .offers-section { background: #141419; border-block: 1px solid var(--border); }
+    .offers-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .offer { position: relative; overflow: hidden; }
+    .offer::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 26px;
+      width: 42px;
+      height: 3px;
+      background: var(--red);
+    }
+    .offer-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 28px;
+      color: var(--muted);
+      font-size: .78rem;
+    }
+    .rank-mark {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      color: var(--red-light);
+      background: #ef493f15;
+      clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+      font-weight: 900;
+    }
+    .offer h3 { margin-bottom: 12px; }
+    .offer .range { color: var(--muted); }
+    .offer .button { width: 100%; }
+    .offers-note { max-width: 800px; margin: 24px 0 0; }
+
+    /* Калькулятор и поля */
+    .calculator-panel {
+      min-width: 0;
+      padding: 30px;
+      border: 2px solid var(--red-light);
+      border-radius: 24px;
+      background: #f5f3f1;
+      color: #202027;
+      box-shadow: 0 24px 70px #0006, 0 0 48px #ef493f24;
+    }
+    .calculator-layout { display: grid; gap: 24px; }
+    .calculator-panel .section-heading { margin-bottom: 0; }
+    .calculator-panel h2 { margin-bottom: 14px; font-size: clamp(1.8rem, 3vw, 2.5rem); }
+    .calculator-panel .eyebrow { color: #b62c25; margin-bottom: 12px; }
+    .calculator-panel .section-heading p,
+    .calculator-panel .note { color: #59555f; }
+    .calculator-panel .rate { margin: 0 0 14px; padding: 8px 14px; background: #ef493f0d; font-size: 1.05rem; }
+    .calculator-panel .rate span { color: #b62c25; }
+    .calculator-panel #mmr-hint { margin-bottom: 0; font-size: .78rem; }
+    .calculator-panel input { background: #fff; color: #202027; border-color: #a29da8; }
+    .calculator-panel .field-error,
+    .calculator-panel .status { color: #a5221c; }
+    .calculator-panel .result { background: #fff; }
+    .calculator-panel .result strong { color: #b62c25; }
+    .calculator-panel .button { min-height: 54px; box-shadow: 0 8px 20px #ef493f26; }
+    .header-calculate { flex-shrink: 0; font-size: .85rem; }
+    .header-inner { gap: 14px; }
+    .nav-list { gap: 12px; }
+    .nav-list a { font-size: .8rem; }
+    .rate {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 16px 22px;
+      border-left: 3px solid var(--red);
+      background: var(--panel);
+      font-size: 1.3rem;
+      font-weight: 800;
+    }
+    .rate span { color: var(--red-light); }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .field { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 8px; font-size: .9rem; font-weight: 700; }
+    input, textarea {
+      display: block;
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid #55545f;
+      background: #101014;
+      color: var(--text);
+    }
+    input:hover, textarea:hover { border-color: #8d8995; }
+    input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--error); }
+    textarea { min-height: 130px; resize: vertical; }
+    .field-error { margin: 6px 0 0; color: var(--error); font-size: .82rem; }
+    .field-error:empty { display: none; }
+    .full-width { width: 100%; }
+    .result {
+      margin-top: 24px;
+      padding: 22px;
+      border: 1px solid #ef493f66;
+      border-radius: 12px;
+      background: #ef493f0c;
+    }
+    .result p { margin-bottom: 6px; }
+    .result strong { display: block; color: var(--red-light); font-size: 2.2rem; line-height: 1.3; }
+    .result .note { margin-top: 12px; margin-bottom: 0; }
+    .status { margin-top: 16px; font-size: .9rem; }
+    .status:empty { display: none; }
+
+    /* Этапы, контакты и подвал */
+    .steps-section { background: #141419; border-block: 1px solid var(--border); }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      padding: 0;
+      margin: 0 0 24px;
+      list-style: none;
+      counter-reset: step;
+    }
+    .steps li {
+      counter-increment: step;
+      padding-top: 20px;
+      border-top: 1px solid #56515a;
+    }
+    .steps li::before {
+      content: "0" counter(step);
+      display: block;
+      margin-bottom: 24px;
+      color: var(--red-light);
+      font-size: 2rem;
+      font-weight: 900;
+    }
+    .steps h3 { font-size: 1.05rem; }
+    .steps p { color: var(--muted); font-size: .9rem; }
+    .contacts-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; }
+    .email-address {
+      display: block;
+      margin-block: 22px 12px;
+      font-size: clamp(1.1rem, 2.1vw, 1.65rem);
+      font-weight: 700;
+      overflow-wrap: anywhere;
+      user-select: all;
+    }
+    .site-footer { padding-block: 36px; border-top: 1px solid var(--border); }
+    .footer-top { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+    .footer-nav { display: flex; gap: 12px 20px; flex-wrap: wrap; max-width: 700px; }
+    .footer-nav a { color: var(--muted); font-size: .85rem; }
+    .footer-nav a:hover { color: var(--red-light); }
+    .site-footer .note { margin: 24px 0 0; }
+
+    /* Планшет и телефон */
+    @media (max-width: 1100px) {
+      .services-grid { grid-template-columns: repeat(2, 1fr); }
+      .menu-toggle { display: inline-flex; align-items: center; }
+      .main-nav {
+        position: absolute;
+        top: calc(100% + 1px);
+        left: 0;
+        right: 0;
+        padding: 12px;
+        border: 1px solid var(--border);
+        border-radius: 0 0 14px 14px;
+        background: #19191f;
+        max-height: calc(100dvh - var(--header-height) - 20px);
+        overflow-y: auto;
+      }
+      .main-nav:not(.is-open) { display: none; }
+      .nav-list { display: block; }
+      .nav-list a { padding: 12px; }
+      .calculator-layout, .contacts-layout { gap: 32px; }
+    }
+
+    @media (max-width: 800px) {
+      .hero-inner { grid-template-columns: 1fr; min-height: auto; gap: 32px; padding-block: 48px; }
+      .offers-grid { grid-template-columns: repeat(2, 1fr); }
+      .calculator-layout, .contacts-layout { grid-template-columns: 1fr; }
+      .steps { grid-template-columns: repeat(2, 1fr); }
+      .section { padding-block: 64px; }
+    }
+
+    @media (max-width: 560px) {
+      :root { --header-height: 70px; }
+      .container { width: calc(100% - 32px); }
+      .hero-inner { grid-template-columns: 1fr; padding-block: 48px 28px; }
+      .calculator-panel { padding: 22px; border-radius: 18px; }
+      .header-calculate { padding: 8px; font-size: .7rem; min-height: 44px; }
+      .logo { font-size: .8rem; gap: 6px; }
+      .logo svg { display: none; }
+      .menu-toggle { max-width: 68px; padding: 6px; font-size: .75rem; }
+      .header-inner { gap: 8px; }
+      .hero-copy > p { font-size: 1rem; }
+      .hero-actions { flex-direction: column; }
+      .services-grid, .offers-grid, .field-row, .steps { grid-template-columns: 1fr; }
+      .card { padding: 22px; }
+      .section { padding-block: 52px; }
+      .steps { gap: 18px; }
+      .steps li::before { margin-bottom: 12px; }
+      .footer-top { flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+      .button:hover { transform: none; }
+    }
+  </style>
+</head>
+
+<body>
+  <a class="skip-link" href="#main">Перейти к содержимому</a>
+
+  <!-- Шапка и мобильная навигация -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="#home" aria-label="DOTA2-bust — главная">
+        <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <path d="M16 2 29 9v14l-13 7L3 23V9Z" stroke="currentColor" stroke-width="2"/>
+          <path d="m11 22 5-12 5 12M13 18h6" stroke="currentColor" stroke-width="2"/>
+        </svg>
+        DOTA2<span>-bust</span>
+      </a>
+
+      <a class="button header-calculate" href="#calculator">Рассчитать MMR</a>
+
+      <button class="menu-toggle" id="menu-toggle" type="button"
+              aria-controls="main-nav" aria-expanded="false">
+        Открыть меню
+      </button>
+
+      <nav class="main-nav" id="main-nav" aria-label="Основная навигация">
+        <ul class="nav-list">
+          <li><a href="#home">Главная</a></li>
+          <li><a href="#services">Услуги</a></li>
+          <li><a href="#bestsellers">Лидеры продаж</a></li>
+          <li><a href="#calculator">Калькулятор MMR</a></li>
+          <li><a href="#how-it-works">Как это работает</a></li>
+          <li><a href="#contacts">Контакты</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- Главный экран -->
+    <section class="hero" id="home" aria-labelledby="hero-title">
+      <div class="container hero-inner">
+        <div class="hero-copy">
+          <span class="eyebrow">Dota 2 / рейтинг / развитие</span>
+          <h1 id="hero-title">DOTA2-bust — твой путь к <span>новому рейтингу!</span></h1>
+          <p>Узнай стоимость повышения MMR, сравни популярные услуги и выбери подходящий вариант</p>
+          <div class="hero-actions">
+            <a class="button" href="#calculator">Рассчитать стоимость MMR ↗</a>
+            <a class="button secondary" href="#bestsellers">Популярные услуги</a>
+          </div>
+          <span class="badge">Учебный проект · Без заказов и оплаты</span>
+        </div>
+
+        <!-- Калькулятор: проверка данных и доступный результат -->
+        <section class="calculator-panel" id="calculator" aria-labelledby="calculator-title">
+          <div class="calculator-layout">
+            <div class="section-heading">
+              <span class="eyebrow">Рассчитай свой следующий шаг</span>
+              <h2 id="calculator-title" tabindex="-1">Калькулятор MMR</h2>
+              <p>Укажи текущий и желаемый рейтинг. Стоимость зависит только от разницы между ними.</p>
+              <p class="rate">1 MMR <span>= 3 ₽</span></p>
+              <p class="note" id="mmr-hint">Оба поля обязательны. Допустимы целые числа от 0 до 15 000. Желаемый MMR должен быть больше текущего.</p>
+            </div>
+    
+            <div class="calculator-form-card">
+              <form id="mmr-form" novalidate>
+                <div class="field-row">
+                  <div class="field">
+                    <label for="current-mmr">Текущий MMR</label>
+                    <input id="current-mmr" name="currentMmr" type="number"
+                           min="0" max="15000" step="1" required
+                           placeholder="Например, 1000"
+                           aria-describedby="mmr-hint current-error">
+                    <p class="field-error" id="current-error"></p>
+                  </div>
+                  <div class="field">
+                    <label for="target-mmr">Желаемый MMR</label>
+                    <input id="target-mmr" name="targetMmr" type="number"
+                           min="0" max="15000" step="1" required
+                           placeholder="Например, 2000"
+                           aria-describedby="mmr-hint target-error">
+                    <p class="field-error" id="target-error"></p>
+                  </div>
+                </div>
+                <button class="button full-width" type="submit">Рассчитать стоимость MMR</button>
+              </form>
+    
+              <div id="calculation-live" aria-live="polite" aria-atomic="true">
+                <div class="result" id="calculation-result" hidden>
+                  <p id="mmr-difference"></p>
+                  <strong id="mmr-price"></strong>
+                  <p class="note">Стоимость ориентировочная. Это учебный расчёт, а не оформление заказа.</p>
+                </div>
+                <p class="status" id="calculation-status"></p>
+              </div>
+            </div>
+      </div>
+    </section>
+      </div>
+    </section>
+
+    <!-- Услуги с раскрывающимися описаниями -->
+    <section class="section" id="services" aria-labelledby="services-title">
+      <div class="container">
+        <div class="section-heading">
+          <span class="eyebrow">01 / Выбери свой формат</span>
+          <h2 id="services-title">Наши услуги</h2>
+          <p>От знакомства с рейтингом до разбора игровых решений. Все цены ниже — учебные примеры.</p>
+        </div>
+
+        <div class="services-grid">
+          <article class="card service-card">
+            <div class="service-icon" aria-hidden="true">↗</div>
+            <h3>Повышение MMR</h3>
+            <p class="description">Оцени стоимость перехода от текущего рейтинга к желаемому.</p>
+            <p class="price">3 ₽ <small>/ 1 MMR</small></p>
+            <button class="button secondary detail-toggle" type="button"
+                    aria-expanded="false" aria-controls="detail-mmr">Подробнее</button>
+            <div class="service-detail" id="detail-mmr" hidden>
+              <p>Расчёт использует разницу между двумя значениями MMR. Введите их в калькулятор: каждый дополнительный пункт стоит 3 ₽.</p>
+            </div>
+          </article>
+
+          <article class="card service-card">
+            <div class="service-icon" aria-hidden="true">◎</div>
+            <h3>Калибровка рейтинга</h3>
+            <p class="description">Демонстрационный формат сопровождения калибровочных игр.</p>
+            <p class="price">от 1 490 ₽ <small>/ услуга</small></p>
+            <button class="button secondary detail-toggle" type="button"
+                    aria-expanded="false" aria-controls="detail-calibration">Подробнее</button>
+            <div class="service-detail" id="detail-calibration" hidden>
+              <p>Пример услуги включает обсуждение роли, подготовки к матчам и особенностей калибровки. Конкретный итоговый рейтинг не гарантируется.</p>
+            </div>
+          </article>
+
+          <article class="card service-card">
+            <div class="service-icon" aria-hidden="true">⊕</div>
+            <h3>Игры с опытным игроком</h3>
+            <p class="description">Командная практика с акцентом на взаимодействие в матче.</p>
+            <p class="price">от 390 ₽ <small>/ игра</small></p>
+            <button class="button secondary detail-toggle" type="button"
+                    aria-expanded="false" aria-controls="detail-party">Подробнее</button>
+            <div class="service-detail" id="detail-party" hidden>
+              <p>Учебное предложение совместной игры: коммуникация, распределение задач и обсуждение решений после матча. Цена указана за одну игру.</p>
+            </div>
+          </article>
+
+          <article class="card service-card">
+            <div class="service-icon" aria-hidden="true">◇</div>
+            <h3>Индивидуальное обучение Dota 2</h3>
+            <p class="description">Разбор повторов, ошибок на линии и решений по карте.</p>
+            <p class="price">от 790 ₽ <small>/ час</small></p>
+            <button class="button secondary detail-toggle" type="button"
+                    aria-expanded="false" aria-controls="detail-coaching">Подробнее</button>
+            <div class="service-detail" id="detail-coaching" hidden>
+              <p>Пример занятия: выбор темы, просмотр игровых эпизодов и составление плана практики. Продолжительность и цена приведены для демонстрации.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Предложения передают значения в калькулятор -->
+    <section class="section offers-section" id="bestsellers" aria-labelledby="offers-title">
+      <div class="container">
+        <div class="section-heading">
+          <span class="eyebrow">02 / Витрина предложений</span>
+          <h2 id="offers-title">Лидеры продаж буст-услуг</h2>
+          <p>Демонстрационная подборка, без статистики реальных продаж. Диапазоны MMR условные и не являются точными границами игровых рангов.</p>
+        </div>
+
+        <div class="offers-grid">
+          <article class="card offer">
+            <div class="offer-top"><span class="rank-mark" aria-hidden="true">I</span><span>Учебное предложение 01</span></div>
+            <h3>Herald → Guardian</h3>
+            <p class="range">Примерно 500 → 1 000 MMR</p>
+            <p class="price">990 ₽ <small>/ средний чек</small></p>
+            <button class="button secondary offer-calculate" type="button" data-current="500" data-target="1000"
+                    aria-label="Рассчитать Herald → Guardian">Рассчитать</button>
+          </article>
+
+          <article class="card offer">
+            <div class="offer-top"><span class="rank-mark" aria-hidden="true">II</span><span>Учебное предложение 02</span></div>
+            <h3>Guardian → Crusader</h3>
+            <p class="range">Примерно 1 000 → 2 000 MMR</p>
+            <p class="price">2 490 ₽ <small>/ средний чек</small></p>
+            <button class="button secondary offer-calculate" type="button" data-current="1000" data-target="2000"
+                    aria-label="Рассчитать Guardian → Crusader">Рассчитать</button>
+          </article>
+
+          <article class="card offer">
+            <div class="offer-top"><span class="rank-mark" aria-hidden="true">III</span><span>Учебное предложение 03</span></div>
+            <h3>Crusader → Archon</h3>
+            <p class="range">Примерно 2 000 → 3 000 MMR</p>
+            <p class="price">2 990 ₽ <small>/ средний чек</small></p>
+            <button class="button secondary offer-calculate" type="button" data-current="2000" data-target="3000"
+                    aria-label="Рассчитать Crusader → Archon">Рассчитать</button>
+          </article>
+
+          <article class="card offer">
+            <div class="offer-top"><span class="rank-mark" aria-hidden="true">IV</span><span>Учебное предложение 04</span></div>
+            <h3>Archon → Legend</h3>
+            <p class="range">Примерно 3 000 → 4 000 MMR</p>
+            <p class="price">3 490 ₽ <small>/ средний чек</small></p>
+            <button class="button secondary offer-calculate" type="button" data-current="3000" data-target="4000"
+                    aria-label="Рассчитать Archon → Legend">Рассчитать</button>
+          </article>
+
+          <article class="card offer">
+            <div class="offer-top"><span class="rank-mark" aria-hidden="true">V</span><span>Учебное предложение 05</span></div>
+            <h3>Legend → Ancient</h3>
+            <p class="range">Примерно 4 000 → 5 000 MMR</p>
+            <p class="price">3 990 ₽ <small>/ средний чек</small></p>
+            <button class="button secondary offer-calculate" type="button" data-current="4000" data-target="5000"
+                    aria-label="Рассчитать Legend → Ancient">Рассчитать</button>
+          </article>
+
+          <article class="card offer">
+            <div class="offer-top"><span class="rank-mark" aria-hidden="true">VI</span><span>Учебное предложение 06</span></div>
+            <h3>Ancient → Divine</h3>
+            <p class="range">Примерно 5 000 → 6 000 MMR</p>
+            <p class="price">4 490 ₽ <small>/ средний чек</small></p>
+            <button class="button secondary offer-calculate" type="button" data-current="5000" data-target="6000"
+                    aria-label="Рассчитать Ancient → Divine">Рассчитать</button>
+          </article>
+        </div>
+
+        <p class="note offers-note">Средний чек приведён для демонстрации. Калькулятор рассчитывает стоимость отдельно по единой ставке 3 ₽ за MMR.</p>
+      </div>
+    </section>
+
+    <!-- Последовательность действий -->
+    <section class="section steps-section" id="how-it-works" aria-labelledby="steps-title">
+      <div class="container">
+        <div class="section-heading">
+          <span class="eyebrow">04 / Четыре простых шага</span>
+          <h2 id="steps-title">Как это работает</h2>
+        </div>
+
+        <ol class="steps">
+          <li>
+            <h3>Выбор услуги</h3>
+            <p>Изучи описания и сравни демонстрационные предложения.</p>
+          </li>
+          <li>
+            <h3>Указание текущего и желаемого рейтинга</h3>
+            <p>Введи значения MMR или выбери предложение из витрины.</p>
+          </li>
+          <li>
+            <h3>Расчёт ориентировочной стоимости</h3>
+            <p>Получи разницу MMR и сумму по единой ставке.</p>
+          </li>
+          <li>
+            <h3>Обсуждение деталей с поддержкой</h3>
+            <p>Перейди к демонстрационным контактам и проверь форму.</p>
+          </li>
+        </ol>
+
+        <p class="note">На учебном сайте последний этап демонстрационный: реальный заказ не оформляется, сообщения не отправляются.</p>
+      </div>
+    </section>
+
+    <!-- Контакты: копирование адреса и локальная проверка формы -->
+    <section class="section" id="contacts" aria-labelledby="contacts-title">
+      <div class="container contacts-layout">
+        <div>
+          <span class="eyebrow">05 / Остались вопросы?</span>
+          <h2 id="contacts-title">Контакты</h2>
+          <p class="muted">Пример контактного раздела для лабораторной работы.</p>
+          <span class="email-address" id="support-email">support@dota2-bust.example</span>
+          <p class="note">Демонстрационный адрес. Не предназначен для реальной связи.</p>
+          <button class="button secondary" id="copy-email" type="button">Скопировать email</button>
+          <p class="status" id="copy-status" role="status" aria-live="polite" aria-atomic="true"></p>
+        </div>
+
+        <form class="card" id="contact-form" novalidate>
+          <h3>Демонстрационная форма</h3>
+          <p class="note">Все поля обязательны. Данные проверяются только в браузере и не отправляются.</p>
+
+          <div class="field">
+            <label for="contact-name">Имя</label>
+            <input id="contact-name" name="name" type="text" required
+                   autocomplete="name" maxlength="100" aria-describedby="name-error">
+            <p class="field-error" id="name-error"></p>
+          </div>
+
+          <div class="field">
+            <label for="contact-email">Email</label>
+            <input id="contact-email" name="email" type="email" required
+                   autocomplete="email" maxlength="254" aria-describedby="email-error">
+            <p class="field-error" id="email-error"></p>
+          </div>
+
+          <div class="field">
+            <label for="contact-message">Сообщение</label>
+            <textarea id="contact-message" name="message" required
+                      maxlength="3000" aria-describedby="message-error"></textarea>
+            <p class="field-error" id="message-error"></p>
+          </div>
+
+          <button class="button full-width" type="submit">Проверить форму</button>
+          <p class="status" id="contact-status" role="status" aria-live="polite" aria-atomic="true"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- Подвал -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <a class="logo" href="#home">DOTA2<span>-bust</span> © <span id="year"></span></a>
+        <nav class="footer-nav" aria-label="Навигация в подвале">
+          <a href="#home">Главная</a>
+          <a href="#services">Услуги</a>
+          <a href="#bestsellers">Лидеры продаж</a>
+          <a href="#calculator">Калькулятор MMR</a>
+          <a href="#how-it-works">Как это работает</a>
+          <a href="#contacts">Контакты</a>
+        </nav>
+      </div>
+      <p class="note">Учебный проект. Не связан с Valve. Все предложения и контакты демонстрационные.</p>
+    </div>
+  </footer>
+
+  <script>
+    "use strict";
+
+    // Текущий год в подвале.
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    // Мобильное меню: состояние, закрытие по ссылке и клавише Escape.
+    const menuToggle = document.getElementById("menu-toggle");
+    const mainNav = document.getElementById("main-nav");
+    const mobileQuery = window.matchMedia("(max-width: 1100px)");
+
+    function setMenu(open) {
+      mainNav.classList.toggle("is-open", open);
+      menuToggle.setAttribute("aria-expanded", String(open));
+      menuToggle.textContent = open ? "Закрыть меню" : "Открыть меню";
+    }
+
+    menuToggle.addEventListener("click", () => {
+      setMenu(menuToggle.getAttribute("aria-expanded") !== "true");
+    });
+
+    mainNav.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => {
+        if (mobileQuery.matches) {
+          setMenu(false);
+          // Перенос фокуса позволяет продолжить работу с клавиатуры.
+          const section = document.querySelector(link.getAttribute("href"));
+          const heading = section.querySelector("h1, h2");
+          heading.setAttribute("tabindex", "-1");
+          heading.focus({ preventScroll: true });
+        }
+      });
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && mainNav.classList.contains("is-open")) {
+        setMenu(false);
+        menuToggle.focus();
+      }
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!event.target.closest(".header-inner")) setMenu(false);
+    });
+
+    mobileQuery.addEventListener("change", () => {
+      if (mainNav.contains(document.activeElement) && mobileQuery.matches) {
+        menuToggle.focus();
+      }
+      setMenu(false);
+    });
+
+    // Каждая кнопка раскрывает только своё описание.
+    document.querySelectorAll(".detail-toggle").forEach((button) => {
+      button.addEventListener("click", () => {
+        const detail = document.getElementById(button.getAttribute("aria-controls"));
+        const open = button.getAttribute("aria-expanded") !== "true";
+        button.setAttribute("aria-expanded", String(open));
+        button.textContent = open ? "Скрыть описание" : "Подробнее";
+        detail.hidden = !open;
+      });
+    });
+
+    // Общая функция для сообщений рядом с полями.
+    function setFieldError(input, errorElement, message) {
+      errorElement.textContent = message;
+      if (message) input.setAttribute("aria-invalid", "true");
+      else input.removeAttribute("aria-invalid");
+    }
+
+    // Калькулятор: строгая проверка, очистка старого результата, расчёт.
+    const currentInput = document.getElementById("current-mmr");
+    const targetInput = document.getElementById("target-mmr");
+    const currentError = document.getElementById("current-error");
+    const targetError = document.getElementById("target-error");
+    const calculationResult = document.getElementById("calculation-result");
+    const calculationStatus = document.getElementById("calculation-status");
+    const differenceOutput = document.getElementById("mmr-difference");
+    const priceOutput = document.getElementById("mmr-price");
+    const numberFormat = new Intl.NumberFormat("ru-RU");
+
+    function clearCalculation(message = "") {
+      calculationResult.hidden = true;
+      differenceOutput.textContent = "";
+      priceOutput.textContent = "";
+      calculationStatus.textContent = message;
+    }
+
+    function validateMmr(input) {
+      const raw = input.value.trim();
+
+      // Некоторые браузеры очищают некорректную числовую запись.
+      if (input.validity.badInput) return "Введите целое число от 0 до 15 000.";
+      if (raw === "") return "Заполните это поле.";
+      if (!/^-?\d+$/.test(raw)) return "Введите целое число без дробной части.";
+
+      const value = Number(raw);
+      if (!Number.isInteger(value)) return "Введите целое число.";
+      if (value < 0 || value > 15000) return "Допустимый диапазон: от 0 до 15 000.";
+      return "";
+    }
+
+    function calculateCost() {
+      clearCalculation();
+
+      const currentMessage = validateMmr(currentInput);
+      let targetMessage = validateMmr(targetInput);
+
+      if (!currentMessage && !targetMessage &&
+          Number(targetInput.value) <= Number(currentInput.value)) {
+        targetMessage = "Желаемый MMR должен быть больше текущего.";
+      }
+
+      setFieldError(currentInput, currentError, currentMessage);
+      setFieldError(targetInput, targetError, targetMessage);
+
+      if (currentMessage || targetMessage) {
+        calculationStatus.textContent = "Расчёт не выполнен. Исправьте ошибки в полях.";
+        (currentMessage ? currentInput : targetInput).focus();
+        return false;
+      }
+
+      const difference = Number(targetInput.value) - Number(currentInput.value);
+      const cost = difference * 3;
+
+      differenceOutput.textContent = "Разница: " + numberFormat.format(difference) + " MMR";
+      priceOutput.textContent = numberFormat.format(cost) + " ₽";
+      calculationResult.hidden = false;
+      return true;
+    }
+
+    document.getElementById("mmr-form").addEventListener("submit", (event) => {
+      event.preventDefault();
+      calculateCost();
+    });
+
+    [currentInput, targetInput].forEach((input) => {
+      input.addEventListener("input", () => {
+        const hadResult = !calculationResult.hidden;
+        clearCalculation(hadResult ? "Данные изменены. Рассчитайте стоимость заново." : "");
+        setFieldError(currentInput, currentError, "");
+        setFieldError(targetInput, targetError, "");
+      });
+    });
+
+    // Кнопки предложений заполняют калькулятор и сразу обновляют сумму.
+    document.querySelectorAll(".offer-calculate").forEach((button) => {
+      button.addEventListener("click", () => {
+        currentInput.value = button.dataset.current;
+        targetInput.value = button.dataset.target;
+        calculateCost();
+
+        document.getElementById("calculator-title").focus({ preventScroll: true });
+        document.getElementById("calculator").scrollIntoView({
+          behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+            ? "auto" : "smooth",
+          block: "start"
+        });
+      });
+    });
+
+    // Копирование: при недоступном буфере адрес остаётся видимым.
+    const copyButton = document.getElementById("copy-email");
+    const copyStatus = document.getElementById("copy-status");
+    const supportEmail = document.getElementById("support-email").textContent.trim();
+
+    copyButton.addEventListener("click", async () => {
+      copyStatus.textContent = "";
+      copyButton.disabled = true;
+
+      try {
+        if (!navigator.clipboard || !navigator.clipboard.writeText) {
+          throw new Error("Clipboard unavailable");
+        }
+        await navigator.clipboard.writeText(supportEmail);
+        copyStatus.textContent = "Email скопирован: " + supportEmail;
+      } catch {
+        copyStatus.textContent =
+          "Не удалось получить доступ к буферу обмена. Скопируйте адрес вручную: " +
+          supportEmail;
+      } finally {
+        copyButton.disabled = false;
+      }
+    });
+
+    // Форма проверяется локально: сетевых запросов и сохранения данных нет.
+    const contactForm = document.getElementById("contact-form");
+    const nameInput = document.getElementById("contact-name");
+    const emailInput = document.getElementById("contact-email");
+    const messageInput = document.getElementById("contact-message");
+    const contactStatus = document.getElementById("contact-status");
+
+    const contactFields = [
+      { input: nameInput, error: document.getElementById("name-error") },
+      { input: emailInput, error: document.getElementById("email-error") },
+      { input: messageInput, error: document.getElementById("message-error") }
+    ];
+
+    contactFields.forEach(({ input, error }) => {
+      input.addEventListener("input", () => {
+        setFieldError(input, error, "");
+        contactStatus.textContent = "";
+      });
+    });
+
+    contactForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      let firstInvalid = null;
+
+      contactFields.forEach(({ input, error }) => {
+        const value = input.value.trim();
+        let message = "";
+
+        if (!value) {
+          message = "Заполните это поле.";
+        } else if (input === emailInput &&
+                   (input.validity.typeMismatch || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))) {
+          message = "Введите email в формате name@example.com.";
+        }
+
+        setFieldError(input, error, message);
+        if (message && !firstInvalid) firstInvalid = input;
+      });
+
+      if (firstInvalid) {
+        contactStatus.textContent = "Исправьте ошибки в форме. Данные не отправлены.";
+        firstInvalid.focus();
+        return;
+      }
+
+      contactStatus.textContent =
+        "Форма заполнена корректно. Это учебная демонстрация: данные не отправлены";
+    });
+  </script>
+</body>
+</html>
