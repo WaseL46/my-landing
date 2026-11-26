@@ -1,5 +1,8 @@
-name: Deploy static site
+# Автоматическая проверка и публикация статического сайта на GitHub Pages.
+# Файл: .github/workflows/deploy.yml
+name: Deploy static site  # Название процесса на вкладке Actions.
 
+# Push запускает публикацию, Pull Request — только проверку, workflow_dispatch — ручной запуск.
 on:
   push:
     branches: [main]
@@ -7,60 +10,73 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Минимальные права для чтения файлов репозитория.
 permissions:
   contents: read
 
+# Последовательно обрабатываем запуски одной ветки, не прерывая текущую публикацию.
 concurrency:
   group: pages-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
+  # Задание 1: проверить HTML и подготовить файлы сайта.
   build:
     name: Validate HTML and build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Виртуальная машина GitHub с Ubuntu.
     steps:
+      # Получить файлы из текущего коммита репозитория.
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Подготовить Node.js и кеш npm для HTML-Validate.
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '24'
           cache: npm
 
+      # Установить точные версии зависимостей из package-lock.json.
       - name: Install dependencies
         run: npm ci
 
+      # Индивидуальное задание: ошибка HTML останавливает дальнейшую публикацию.
       - name: Validate HTML
         run: npm run lint:html
 
+      # Собрать статические файлы в _site; deepseek.html копируется без изменений.
       - name: Prepare static site
         run: |
           mkdir -p _site
           cp index.html style.css deepseek.html _site/
           cp -R assets _site/assets
 
+      # Передать подготовленный сайт заданию публикации; для Pull Request шаг пропускается.
       - name: Upload Pages artifact
         if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
           path: _site
 
+  # Задание 2: опубликовать сайт только после успешной проверки и подготовки файлов.
   deploy:
     name: Deploy to GitHub Pages
     if: github.event_name != 'pull_request'
-    needs: build
-    runs-on: ubuntu-latest
+    needs: build  # При ошибке build публикация не запускается.
+    runs-on: ubuntu-latest  # Виртуальная машина GitHub с Ubuntu.
     permissions:
-      pages: write
-      id-token: write
+      pages: write  # Разрешение на публикацию в GitHub Pages.
+      id-token: write  # OIDC-токен для подтверждения публикации.
     environment:
-      name: github-pages
+      name: github-pages  # Окружение публикации.
+      # Ссылка на опубликованный сайт в сводке запуска.
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      # Подготовить окружение GitHub Pages.
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
+      # Опубликовать артефакт, загруженный заданием build.
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
